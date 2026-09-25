@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(public\\)\\\\events\\\\[id]\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(public\\)\\\\about\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\login\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\dashboard\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\events\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\events\\\\new\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\events\\\\[id]\\\\edit\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\leads\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\\\(admin\\)\\\\settings\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\components\\\\ui\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\lib\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\actions\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\prisma\")",
+      "Bash(cat \"C:\\\\Users\\\\comp\\\\.claude\\\\projects\\\\c--Users-comp-Desktop-grp-porject-satish\\\\ef6e0e81-07b9-47c7-9f0c-faca56dfbb8f\\\\subagents\\\\workflows\\\\wf_4b9e686e-e92\\\\agent-acce210fb5cf00d0e.jsonl\" | tail -20)",
+      "Read(//c/Users/comp/.claude/projects/c--Users-comp-Desktop-grp-porject-satish/ef6e0e81-07b9-47c7-9f0c-faca56dfbb8f/subagents/workflows/wf_4b9e686e-e92/**)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\api\\\\events\\\\[id]\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\api\\\\admin\\\\events\\\\[id]\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\api\\\\admin\\\\leads\\\\[id]\" \"C:\\\\Users\\\\comp\\\\Desktop\\\\grp-porject\\\\satish\\\\src\\\\app\\\\api\\\\auth\\\\[...nextauth]\")",
+      "Bash(cp backend/api/admin/admins/\\\\[id\\\\]/route.ts src/app/api/admin/admins/\\\\[id\\\\]/)",
+      "Bash(cp backend/api/admin/events/\\\\[id\\\\]/route.ts src/app/api/admin/events/\\\\[id\\\\]/)",
+      "Bash(cp backend/api/admin/leads/\\\\[id\\\\]/route.ts src/app/api/admin/leads/\\\\[id\\\\]/)",
+      "Bash(cp backend/api/events/\\\\[id\\\\]/route.ts src/app/api/events/\\\\[id\\\\]/)",
+      "Bash(cp backend/api/events/\\\\[id\\\\]/interest/route.ts src/app/api/events/\\\\[id\\\\]/interest/)",
+      "Bash(npm install *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\comp\\Desktop\\grp-porject\\satish\\src\\app\\(public)\\events",
+      "C:\\Users\\comp\\Desktop\\grp-porject\\satish\\src\\app\\api\\events"
+    ]
+  }
+}

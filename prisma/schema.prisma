@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Event {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  dateStart     DateTime
+  dateEnd       DateTime?
+  reportingTime String
+  eventHours    String
+  location      String
+  mapLink       String?
+  role          String
+  payment       String
+  perks         String?
+  genderReq     String
+  slotsNeeded   Int
+  contact       String
+  imageUrl      String?
+  eventType     String     @default("VOLUNTEER")
+  tagline       String?
+  destination   String?
+  upiId         String?
+  paymentQrCode String?
+  status        String     @default("ACTIVE")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  interests     Interest[]
+}
+
+model Interest {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId     String   @db.ObjectId
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name        String
+  phone       String
+  transactionId String?
+  paymentScreenshot String?
+  status      String   @default("NEW")
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PushSubscription {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
