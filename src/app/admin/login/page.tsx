@@ -111,10 +111,6 @@ function LoginForm() {
           </Button>
         </form>
 
-        <div className="mt-6 p-4 bg-muted rounded-lg text-sm text-center text-muted-foreground">
-          <p>Demo credentials:</p>
-          <p className="font-mono mt-1 font-semibold text-foreground">admin@example.com / password123</p>
-        </div>
       </CardContent>
     </Card>
   );
