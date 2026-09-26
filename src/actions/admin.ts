@@ -6,24 +6,29 @@ import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { withRetry } from '@/lib/retry';
 
 export async function createAdmin(data: AdminInput) {
   const validated = adminSchema.parse(data);
 
-  const existing = await prisma.admin.findUnique({
-    where: { email: validated.email },
-  });
+  const existing = await withRetry(() =>
+    prisma.admin.findUnique({
+      where: { email: validated.email },
+    })
+  );
 
   if (existing) throw new Error('Admin with this email already exists');
 
   const passwordHash = await bcrypt.hash(validated.password, 12);
 
-  const admin = await prisma.admin.create({
-    data: {
-      email: validated.email,
-      passwordHash,
-    },
-  });
+  const admin = await withRetry(() =>
+    prisma.admin.create({
+      data: {
+        email: validated.email,
+        passwordHash,
+      },
+    })
+  );
 
   revalidatePath('/admin/settings');
   return { id: admin.id, email: admin.email };
@@ -32,9 +37,11 @@ export async function createAdmin(data: AdminInput) {
 export async function loginAdmin(data: LoginInput) {
   const validated = loginSchema.parse(data);
 
-  const admin = await prisma.admin.findUnique({
-    where: { email: validated.email },
-  });
+  const admin = await withRetry(() =>
+    prisma.admin.findUnique({
+      where: { email: validated.email },
+    })
+  );
 
   if (!admin) throw new Error('Invalid credentials');
 
@@ -57,9 +64,11 @@ export async function updateAdminPassword(data: SettingsInput) {
     throw new Error('Current and new password required');
   }
 
-  const admin = await prisma.admin.findUnique({
-    where: { id: userId },
-  });
+  const admin = await withRetry(() =>
+    prisma.admin.findUnique({
+      where: { id: userId },
+    })
+  );
 
   if (!admin) throw new Error('Admin not found');
 
@@ -69,10 +78,12 @@ export async function updateAdminPassword(data: SettingsInput) {
 
   const passwordHash = await bcrypt.hash(validated.newPassword, 12);
 
-  await prisma.admin.update({
-    where: { id: admin.id },
-    data: { passwordHash },
-  });
+  await withRetry(() =>
+    prisma.admin.update({
+      where: { id: admin.id },
+      data: { passwordHash },
+    })
+  );
 
   return { success: true };
 }
@@ -83,10 +94,12 @@ export async function getAdmins() {
 
   if (!userId) throw new Error('Unauthorized');
 
-  const admins = await prisma.admin.findMany({
-    select: { id: true, email: true, createdAt: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  const admins = await withRetry(() =>
+    prisma.admin.findMany({
+      select: { id: true, email: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    })
+  );
 
   return admins;
 }
@@ -98,9 +111,11 @@ export async function deleteAdmin(id: string) {
   if (!userId) throw new Error('Unauthorized');
   if (userId === id) throw new Error('Cannot delete yourself');
 
-  await prisma.admin.delete({
-    where: { id },
-  });
+  await withRetry(() =>
+    prisma.admin.delete({
+      where: { id },
+    })
+  );
 
   revalidatePath('/admin/settings');
 }

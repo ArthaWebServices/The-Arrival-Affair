@@ -4,19 +4,22 @@ import { prisma } from '@/lib/prisma';
 import { eventSchema, EventInput } from '@/lib/validations';
 import { revalidatePath } from 'next/cache';
 import bcrypt from 'bcryptjs';
+import { withRetry } from '@/lib/retry';
 
 export type { EventInput };
 
 export async function createEvent(data: EventInput) {
   const validated = eventSchema.parse(data);
 
-  const event = await prisma.event.create({
-    data: {
-      ...validated,
-      dateStart: new Date(validated.dateStart),
-      dateEnd: validated.dateEnd ? new Date(validated.dateEnd) : null,
-    },
-  });
+  const event = await withRetry(() =>
+    prisma.event.create({
+      data: {
+        ...validated,
+        dateStart: new Date(validated.dateStart),
+        dateEnd: validated.dateEnd ? new Date(validated.dateEnd) : null,
+      },
+    })
+  );
 
   revalidatePath('/admin/events');
   revalidatePath('/');
@@ -26,14 +29,16 @@ export async function createEvent(data: EventInput) {
 export async function updateEvent(id: string, data: Partial<EventInput>) {
   const validated = eventSchema.partial().parse(data);
 
-  const event = await prisma.event.update({
-    where: { id },
-    data: {
-      ...validated,
-      dateStart: validated.dateStart ? new Date(validated.dateStart) : undefined,
-      dateEnd: validated.dateEnd ? new Date(validated.dateEnd) : undefined,
-    },
-  });
+  const event = await withRetry(() =>
+    prisma.event.update({
+      where: { id },
+      data: {
+        ...validated,
+        dateStart: validated.dateStart ? new Date(validated.dateStart) : undefined,
+        dateEnd: validated.dateEnd ? new Date(validated.dateEnd) : undefined,
+      },
+    })
+  );
 
   revalidatePath('/admin/events');
   revalidatePath('/');
@@ -42,40 +47,46 @@ export async function updateEvent(id: string, data: Partial<EventInput>) {
 }
 
 export async function deleteEvent(id: string) {
-  await prisma.event.delete({
-    where: { id },
-  });
+  await withRetry(() =>
+    prisma.event.delete({
+      where: { id },
+    })
+  );
 
   revalidatePath('/admin/events');
   revalidatePath('/');
 }
 
 export async function duplicateEvent(id: string) {
-  const event = await prisma.event.findUnique({
-    where: { id },
-  });
+  const event = await withRetry(() =>
+    prisma.event.findUnique({
+      where: { id },
+    })
+  );
 
   if (!event) throw new Error('Event not found');
 
-  const newEvent = await prisma.event.create({
-    data: {
-      title: `${event.title} (Copy)`,
-      description: event.description,
-      dateStart: event.dateStart,
-      dateEnd: event.dateEnd,
-      reportingTime: event.reportingTime,
-      eventHours: event.eventHours,
-      location: event.location,
-      mapLink: event.mapLink,
-      role: event.role,
-      payment: event.payment,
-      perks: event.perks,
-      genderReq: event.genderReq,
-      slotsNeeded: event.slotsNeeded,
-      contact: event.contact,
-      status: 'DRAFT',
-    },
-  });
+  const newEvent = await withRetry(() =>
+    prisma.event.create({
+      data: {
+        title: `${event.title} (Copy)`,
+        description: event.description,
+        dateStart: event.dateStart,
+        dateEnd: event.dateEnd,
+        reportingTime: event.reportingTime,
+        eventHours: event.eventHours,
+        location: event.location,
+        mapLink: event.mapLink,
+        role: event.role,
+        payment: event.payment,
+        perks: event.perks,
+        genderReq: event.genderReq,
+        slotsNeeded: event.slotsNeeded,
+        contact: event.contact,
+        status: 'DRAFT',
+      },
+    })
+  );
 
   revalidatePath('/admin/events');
   return newEvent;
@@ -124,39 +135,45 @@ export async function getEvents(filters?: {
     ];
   }
 
-  const events = await prisma.event.findMany({
-    where,
-    include: {
-      _count: {
-        select: { interests: true },
+  const events = await withRetry(() =>
+    prisma.event.findMany({
+      where,
+      include: {
+        _count: {
+          select: { interests: true },
+        },
       },
-    },
-    orderBy: { dateStart: 'asc' },
-  });
+      orderBy: { dateStart: 'asc' },
+    })
+  );
 
   return events;
 }
 
 export async function getEventById(id: string) {
-  const event = await prisma.event.findUnique({
-    where: { id },
-    include: {
-      interests: {
-        orderBy: { submittedAt: 'desc' },
+  const event = await withRetry(() =>
+    prisma.event.findUnique({
+      where: { id },
+      include: {
+        interests: {
+          orderBy: { submittedAt: 'desc' },
+        },
       },
-    },
-  });
+    })
+  );
   return event;
 }
 
 export async function getAdminEvents() {
-  const events = await prisma.event.findMany({
-    include: {
-      _count: {
-        select: { interests: true },
+  const events = await withRetry(() =>
+    prisma.event.findMany({
+      include: {
+        _count: {
+          select: { interests: true },
+        },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+      orderBy: { createdAt: 'desc' },
+    })
+  );
   return events;
 }

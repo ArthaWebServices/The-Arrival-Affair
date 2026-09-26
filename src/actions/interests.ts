@@ -11,25 +11,33 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY as string
 );
 
+import { withRetry } from '@/lib/retry';
+
 export async function createInterest(data: InterestInput) {
   const validated = interestSchema.parse(data);
 
-  const interest = await prisma.interest.create({
-    data: validated,
-  });
+  const { interest, event } = await withRetry(async () => {
+    // We use a transaction to ensure both operations succeed or fail together
+    return await prisma.$transaction(async (tx) => {
+      const newInterest = await tx.interest.create({
+        data: validated,
+      });
 
-  // Check if slots are filled
-  const event = await prisma.event.findUnique({
-    where: { id: validated.eventId },
-    include: { _count: { select: { interests: true } } },
-  });
+      const event = await tx.event.findUnique({
+        where: { id: validated.eventId },
+        include: { _count: { select: { interests: true } } },
+      });
 
-  if (event && event._count.interests >= event.slotsNeeded) {
-    await prisma.event.update({
-      where: { id: validated.eventId },
-      data: { status: 'FILLED' },
+      if (event && event._count.interests >= event.slotsNeeded) {
+        await tx.event.update({
+          where: { id: validated.eventId },
+          data: { status: 'FILLED' },
+        });
+      }
+
+      return { interest: newInterest, event };
     });
-  }
+  });
 
   revalidatePath(`/events/${validated.eventId}`);
   revalidatePath('/admin/leads');
@@ -69,19 +77,23 @@ export async function createInterest(data: InterestInput) {
 }
 
 export async function updateInterestStatus(id: string, status: string) {
-  const interest = await prisma.interest.update({
-    where: { id },
-    data: { status: status as any },
-  });
+  const interest = await withRetry(() => 
+    prisma.interest.update({
+      where: { id },
+      data: { status: status as any },
+    })
+  );
 
   revalidatePath('/admin/leads');
   return interest;
 }
 
 export async function deleteInterest(id: string) {
-  await prisma.interest.delete({
-    where: { id },
-  });
+  await withRetry(() =>
+    prisma.interest.delete({
+      where: { id },
+    })
+  );
 
   revalidatePath('/admin/leads');
 }
@@ -89,15 +101,17 @@ export async function deleteInterest(id: string) {
 export async function getInterests(eventId?: string) {
   const where = eventId ? { eventId } : {};
 
-  const interests = await prisma.interest.findMany({
-    where,
-    include: {
-      event: {
-        select: { title: true },
+  const interests = await withRetry(() =>
+    prisma.interest.findMany({
+      where,
+      include: {
+        event: {
+          select: { title: true },
+        },
       },
-    },
-    orderBy: { submittedAt: 'desc' },
-  });
+      orderBy: { submittedAt: 'desc' },
+    })
+  );
 
   return interests;
 }

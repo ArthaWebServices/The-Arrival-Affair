@@ -41,6 +41,8 @@ model Event {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   interests     Interest[]
+
+  @@index([status, dateStart])
 }
 
 model Interest {
@@ -57,6 +59,10 @@ model Interest {
   status            String   @default("NEW")
   submittedAt       DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([status])
+  @@index([submittedAt(sort: Desc)])
 }
 
 model PushSubscription {
