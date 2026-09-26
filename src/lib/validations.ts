@@ -28,6 +28,9 @@ export const interestSchema = z.object({
   eventId: z.string().min(1, 'Event ID is required'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  email: z.string().email('Invalid email address').optional().or(z.literal('')),
+  gender: z.string().optional(),
+  foodPreference: z.string().optional(),
   transactionId: z.string().optional(),
   paymentScreenshot: z.string().optional(),
 });

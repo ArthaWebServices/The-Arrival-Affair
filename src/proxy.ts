@@ -17,9 +17,10 @@ export default withAuth(
     // Protect all admin routes
     if (path.startsWith('/admin')) {
       if (!token) {
-        const loginUrl = new URL('/admin/login', req.url);
-        loginUrl.searchParams.set('callbackUrl', path);
-        return NextResponse.redirect(loginUrl);
+        return NextResponse.redirect(new URL('/', req.url));
+      }
+      if (path === '/admin') {
+        return NextResponse.redirect(new URL('/admin/dashboard', req.url));
       }
     }
 

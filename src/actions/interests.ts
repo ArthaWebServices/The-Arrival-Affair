@@ -105,17 +105,21 @@ export async function getInterests(eventId?: string) {
 export async function exportInterestsToCSV(eventId?: string) {
   const interests = await getInterests(eventId);
 
-  const headers = ['Name', 'Phone', 'Event', 'Status', 'Submitted At'];
-  const rows = interests.map((i) => [
+  const headers = ['Name', 'Phone', 'Email', 'Gender', 'Food Preference', 'Event', 'Transaction ID', 'Status', 'Submitted At'];
+  const rows = interests.map((i: any) => [
     i.name,
     i.phone,
+    i.email || '',
+    i.gender || '',
+    i.foodPreference || '',
     i.event.title,
+    i.transactionId || '',
     i.status,
     i.submittedAt.toISOString(),
   ]);
 
   const csv = [headers, ...rows]
-    .map((row) => row.map((cell) => `"${cell}"`).join(','))
+    .map((row) => row.map((cell: any) => `"${cell}"`).join(','))
     .join('\n');
 
   return csv;

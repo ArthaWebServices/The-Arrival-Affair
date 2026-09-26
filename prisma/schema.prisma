@@ -44,16 +44,19 @@ model Event {
 }
 
 model Interest {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  eventId     String   @db.ObjectId
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name        String
-  phone       String
-  transactionId String?
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId           String   @db.ObjectId
+  event             Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name              String
+  phone             String
+  email             String?
+  gender            String?
+  foodPreference    String?
+  transactionId     String?
   paymentScreenshot String?
-  status      String   @default("NEW")
-  submittedAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status            String   @default("NEW")
+  submittedAt       DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model PushSubscription {

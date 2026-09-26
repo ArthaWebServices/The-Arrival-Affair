@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -33,8 +33,16 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (status === 'unauthenticated' && pathname !== '/admin/login') {
+      router.replace('/');
+    }
+  }, [status, pathname, router]);
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
@@ -61,7 +69,7 @@ export default function AdminLayout({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-4 border-b flex items-center justify-between">
-            <Link href="/admin/dashboard" className="flex items-center gap-2">
+            <Link href="/admin/dashboard" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <Calendar className="h-5 w-5 text-primary-foreground" />
               </div>
@@ -87,6 +95,7 @@ export default function AdminLayout({
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive
@@ -116,7 +125,7 @@ export default function AdminLayout({
             <Button
               variant="ghost"
               className="w-full justify-start mt-2"
-              onClick={() => signOut({ callbackUrl: '/admin/login' })}
+              onClick={() => signOut({ callbackUrl: '/' })}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
@@ -137,14 +146,9 @@ export default function AdminLayout({
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <h1 className="text-xl font-semibold hidden sm:block">
-                {navigation.find(n => pathname === n.href || (n.href !== '/admin/dashboard' && pathname.startsWith(n.href)))?.name || 'Dashboard'} · The Arrival Affairs
-              </h1>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                Event Volunteer Platform
-              </span>
+              {/* Optional actions or profile icon can go here */}
             </div>
           </div>
         </header>

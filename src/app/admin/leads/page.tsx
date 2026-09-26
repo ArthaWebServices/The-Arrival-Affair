@@ -378,13 +378,33 @@ export default function LeadsPage() {
           <div className="py-4 space-y-4">
             {paymentLead && (
               <>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Applicant</p>
-                  <p>{paymentLead.name}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Applicant</p>
+                    <p className="font-medium">{paymentLead.name}</p>
+                  </div>
+                  {paymentLead.email && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Email</p>
+                      <p className="text-sm break-all">{paymentLead.email}</p>
+                    </div>
+                  )}
+                  {paymentLead.gender && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                      <p className="text-sm">{paymentLead.gender}</p>
+                    </div>
+                  )}
+                  {paymentLead.foodPreference && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Food Preference</p>
+                      <p className="text-sm">{paymentLead.foodPreference}</p>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Transaction ID</p>
-                  <p className="font-mono bg-muted p-2 rounded inline-block mt-1">{paymentLead.transactionId || 'N/A'}</p>
+                  <p className="font-mono bg-muted p-2 rounded inline-block mt-1 text-sm">{paymentLead.transactionId || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Screenshot</p>
@@ -397,7 +417,7 @@ export default function LeadsPage() {
                       </a>
                     </div>
                   ) : (
-                    <p className="text-muted-foreground mt-1">No screenshot provided</p>
+                    <p className="text-muted-foreground mt-1 text-sm">No screenshot provided</p>
                   )}
                 </div>
               </>
