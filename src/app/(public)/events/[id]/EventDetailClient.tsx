@@ -18,7 +18,7 @@ import {
 import {
   Calendar, MapPin, DollarSign, Users, Clock, Phone, Share2,
   MessageSquare, AlertCircle, CheckCircle, X, Loader2, Mountain,
-  UtensilsCrossed, Mail, UserCheck,
+  UtensilsCrossed, Mail, UserCheck, Smartphone,
 } from 'lucide-react';
 import { formatDate, maskPhone, getWhatsAppLink } from '@/lib/utils';
 import { createInterest } from '@/actions/interests';
@@ -49,6 +49,9 @@ export default function EventDetailClient({ event }: { event: any }) {
 
   const isAdventure = event.eventType === 'ADVENTURE';
   const hasPayment = !!(event.upiId || event.paymentQrCode);
+
+  const numericAmount = parseFloat((event.payment || '').replace(/[^0-9.]/g, ''));
+  const isValidAmount = !isNaN(numericAmount) && numericAmount > 0;
 
   const interestCount = event._count?.interests || event.interests?.length || 0;
   const slotsLeft = event.slotsNeeded - interestCount;
@@ -431,6 +434,26 @@ export default function EventDetailClient({ event }: { event: any }) {
                             <div>
                               <p className="text-xs font-medium text-muted-foreground mb-2">Scan to Pay</p>
                               <img src={event.paymentQrCode} alt="Payment QR Code" className="max-w-[180px] sm:max-w-[200px] rounded-lg shadow-sm" />
+                            </div>
+                          )}
+
+                          {/* Mobile UPI Intent Button */}
+                          {event.upiId && isValidAmount && (
+                            <div className="block sm:hidden mt-4 pt-4 border-t border-border/50">
+                              <Button 
+                                type="button"
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2"
+                                onClick={() => {
+                                  const upiLink = `upi://pay?pa=${event.upiId}&pn=${encodeURIComponent(event.title || 'The Arrival Affairs')}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent('Booking: ' + event.title)}`;
+                                  window.location.href = upiLink;
+                                }}
+                              >
+                                <Smartphone className="h-4 w-4" />
+                                Pay ₹{numericAmount} via UPI App
+                              </Button>
+                              <p className="text-[10px] text-muted-foreground text-center mt-2">
+                                Opens GPay, PhonePe, or Paytm automatically
+                              </p>
                             </div>
                           )}
                         </div>

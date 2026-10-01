@@ -110,9 +110,11 @@ export default function AdminLayout({
             })}
           </nav>
 
-          {/* User section */}
+          {/* User section — Fix #10: Separator spans full content width via -mx-4 px-4
+               Fix #18: mt-4 instead of mt-2 gives more breathing room before Sign Out */}
           <div className="p-4 border-t">
-            <Separator className="mb-4" />
+            {/* Fix #10: extend separator to match nav-item width */}
+            <Separator className="mb-4 -mx-4 w-[calc(100%+2rem)]" />
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 <Users className="h-4 w-4 text-primary" />
@@ -122,9 +124,10 @@ export default function AdminLayout({
                 <p className="text-xs text-muted-foreground truncate">The Arrival Affairs</p>
               </div>
             </div>
+            {/* Fix #18: mt-4 (was mt-2) balances the vertical distribution */}
             <Button
               variant="ghost"
-              className="w-full justify-start mt-2"
+              className="w-full justify-start mt-4"
               onClick={() => signOut({ callbackUrl: '/' })}
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -153,8 +156,9 @@ export default function AdminLayout({
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="p-4 lg:p-6">
+        {/* Page Content — Fix #9: pr-4 lg:pr-6 ensures a right-gutter so any
+             fixed/floating widget (e.g. chat bubble) stays outside the content area */}
+        <main className="p-4 lg:p-6 pr-6 lg:pr-8">
           {children}
         </main>
       </div>
