@@ -12,6 +12,8 @@ webpush.setVapidDetails(
 );
 
 import { withRetry } from '@/lib/retry';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function createInterest(data: InterestInput) {
   const validated = interestSchema.parse(data);
@@ -77,6 +79,9 @@ export async function createInterest(data: InterestInput) {
 }
 
 export async function updateInterestStatus(id: string, status: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   const interest = await withRetry(() => 
     prisma.interest.update({
       where: { id },
@@ -89,6 +94,9 @@ export async function updateInterestStatus(id: string, status: string) {
 }
 
 export async function deleteInterest(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   await withRetry(() =>
     prisma.interest.delete({
       where: { id },
@@ -99,6 +107,9 @@ export async function deleteInterest(id: string) {
 }
 
 export async function getInterests(eventId?: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   const where = eventId ? { eventId } : {};
 
   const interests = await withRetry(() =>

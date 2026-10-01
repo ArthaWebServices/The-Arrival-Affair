@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { getEvents } from '@/actions/events';
 import EventBrowser from './EventBrowser';
 import { Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,11 +27,15 @@ export default async function HomePage() {
             <Link href="#events" className="text-muted-foreground hover:text-foreground transition-colors">
               Browse Events
             </Link>
-            <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors hidden sm:inline-block">
               About Us
             </Link>
+            <Link href="/status" className="text-muted-foreground hover:text-foreground transition-colors">
+              Check Status
+            </Link>
+            <ThemeToggle />
             <Link href="/admin/login">
-              <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+              <Button variant="outline" size="sm" className="hidden sm:inline-flex border-primary/20 hover:bg-primary/5">
                 Admin Portal
               </Button>
             </Link>
@@ -62,8 +67,13 @@ export default async function HomePage() {
                 Browse Opportunities <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/about">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto px-8">
+            <Link href="/status">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto px-8">
+                Check Status
+              </Button>
+            </Link>
+            <Link href="/about" className="hidden sm:inline-block">
+              <Button size="lg" variant="ghost" className="w-full sm:w-auto px-8">
                 Our Story
               </Button>
             </Link>

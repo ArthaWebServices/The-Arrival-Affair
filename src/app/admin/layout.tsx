@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PushNotificationManager from '@/components/PushNotificationManager';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -151,7 +152,7 @@ export default function AdminLayout({
               </button>
             </div>
             <div className="flex items-center gap-4">
-              {/* Optional actions or profile icon can go here */}
+              <ThemeToggle />
             </div>
           </div>
         </header>

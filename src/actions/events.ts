@@ -5,10 +5,15 @@ import { eventSchema, EventInput } from '@/lib/validations';
 import { revalidatePath } from 'next/cache';
 import bcrypt from 'bcryptjs';
 import { withRetry } from '@/lib/retry';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export type { EventInput };
 
 export async function createEvent(data: EventInput) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   const validated = eventSchema.parse(data);
 
   const event = await withRetry(() =>
@@ -27,6 +32,9 @@ export async function createEvent(data: EventInput) {
 }
 
 export async function updateEvent(id: string, data: Partial<EventInput>) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   const validated = eventSchema.partial().parse(data);
 
   const event = await withRetry(() =>
@@ -47,6 +55,9 @@ export async function updateEvent(id: string, data: Partial<EventInput>) {
 }
 
 export async function deleteEvent(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   await withRetry(() =>
     prisma.event.delete({
       where: { id },
@@ -58,6 +69,9 @@ export async function deleteEvent(id: string) {
 }
 
 export async function duplicateEvent(id: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   const event = await withRetry(() =>
     prisma.event.findUnique({
       where: { id },
@@ -165,6 +179,9 @@ export async function getEventById(id: string) {
 }
 
 export async function getAdminEvents() {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+
   const events = await withRetry(() =>
     prisma.event.findMany({
       include: {

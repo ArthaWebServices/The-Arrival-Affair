@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +46,23 @@ export default function EventDetailClient({ event }: { event: any }) {
     transactionId: '',
     paymentScreenshot: '',
   });
+
+  // Restore form state if returning from payment app
+  useEffect(() => {
+    const saved = sessionStorage.getItem(`event_form_${event.id}`);
+    if (saved) {
+      try {
+        setFormData(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse saved form data');
+      }
+    }
+  }, [event.id]);
+
+  // Save form state automatically as they type
+  useEffect(() => {
+    sessionStorage.setItem(`event_form_${event.id}`, JSON.stringify(formData));
+  }, [formData, event.id]);
 
   const isAdventure = event.eventType === 'ADVENTURE';
   const hasPayment = !!(event.upiId || event.paymentQrCode);
@@ -93,6 +110,7 @@ export default function EventDetailClient({ event }: { event: any }) {
       });
       toast({ title: 'Registration submitted! 🎉', description: "We'll contact you soon." });
       setFormData({ name: '', phone: '', email: '', gender: '', foodPreference: '', transactionId: '', paymentScreenshot: '' });
+      sessionStorage.removeItem(`event_form_${event.id}`);
     } catch (error: any) {
       toast({ title: 'Submission failed', description: error.message || 'Please try again.', variant: 'destructive' });
     } finally {
@@ -112,7 +130,7 @@ export default function EventDetailClient({ event }: { event: any }) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 sm:pb-0">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
 
         {/* Back Link */}
@@ -124,12 +142,11 @@ export default function EventDetailClient({ event }: { event: any }) {
 
         {/* Event Banner Image */}
         {event.imageUrl && (
-          <div className="mb-6 rounded-2xl overflow-hidden border shadow-sm w-full" style={{ maxHeight: '420px' }}>
+          <div className="mb-6 rounded-2xl overflow-hidden border shadow-sm w-full h-56 sm:h-80 lg:h-[420px]">
             <img
               src={event.imageUrl}
               alt={`${event.title} banner`}
-              className="w-full object-cover"
-              style={{ maxHeight: '420px' }}
+              className="w-full h-full object-cover"
             />
           </div>
         )}
@@ -327,7 +344,7 @@ export default function EventDetailClient({ event }: { event: any }) {
                           value={formData.name}
                           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                           placeholder="Enter your full name"
-                          className={errors.name ? 'border-destructive' : ''}
+                          className={`h-12 ${errors.name ? 'border-destructive' : ''}`}
                           disabled={isSubmitting}
                         />
                         {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
@@ -337,10 +354,11 @@ export default function EventDetailClient({ event }: { event: any }) {
                         <Input
                           id="phone"
                           type="tel"
+                          inputMode="tel"
                           value={formData.phone}
                           onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                           placeholder="Enter your phone number"
-                          className={errors.phone ? 'border-destructive' : ''}
+                          className={`h-12 ${errors.phone ? 'border-destructive' : ''}`}
                           disabled={isSubmitting}
                         />
                         {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone}</p>}
@@ -361,10 +379,11 @@ export default function EventDetailClient({ event }: { event: any }) {
                             <Input
                               id="email"
                               type="email"
+                              inputMode="email"
                               value={formData.email}
                               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                               placeholder="you@example.com"
-                              className={errors.email ? 'border-destructive' : ''}
+                              className={`h-12 ${errors.email ? 'border-destructive' : ''}`}
                               disabled={isSubmitting}
                             />
                             {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
@@ -465,7 +484,7 @@ export default function EventDetailClient({ event }: { event: any }) {
                             value={formData.transactionId}
                             onChange={(e) => setFormData(prev => ({ ...prev, transactionId: e.target.value }))}
                             placeholder="Enter Transaction / UTR number"
-                            className={errors.transactionId ? 'border-destructive' : ''}
+                            className={`h-12 ${errors.transactionId ? 'border-destructive' : ''}`}
                             disabled={isSubmitting}
                           />
                           {errors.transactionId && <p className="text-sm text-destructive mt-1">{errors.transactionId}</p>}
@@ -483,18 +502,20 @@ export default function EventDetailClient({ event }: { event: any }) {
                       </div>
                     )}
 
-                    <p className="text-xs text-muted-foreground pt-1">
+                    <p className="text-xs text-muted-foreground pt-1 pb-4 sm:pb-0">
                       By submitting, you agree to be contacted by the organizer regarding this {isAdventure ? 'trek' : 'event'}.
                     </p>
-                    <Button type="submit" className={`w-full ${isAdventure ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}`} disabled={isSubmitting}>
-                      {isSubmitting ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
-                      ) : isAdventure ? (
-                        <><Mountain className="mr-2 h-4 w-4" /> Book My Spot</>
-                      ) : (
-                        "I'm Interested"
-                      )}
-                    </Button>
+                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t z-50 sm:static sm:p-0 sm:bg-transparent sm:border-t-0 sm:z-auto">
+                      <Button type="submit" className={`w-full h-12 text-base sm:h-10 sm:text-sm ${isAdventure ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}`} disabled={isSubmitting}>
+                        {isSubmitting ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                        ) : isAdventure ? (
+                          <><Mountain className="mr-2 h-4 w-4" /> Book My Spot</>
+                        ) : (
+                          "I'm Interested"
+                        )}
+                      </Button>
+                    </div>
                   </form>
                 )}
               </CardContent>
