@@ -459,19 +459,23 @@ export default function EventDetailClient({ event }: { event: any }) {
                           {/* Mobile UPI Intent Button */}
                           {event.upiId && isValidAmount && (
                             <div className="block sm:hidden mt-4 pt-4 border-t border-border/50">
-                              <Button 
-                                type="button"
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2"
-                                onClick={() => {
-                                  const upiLink = `upi://pay?pa=${event.upiId}&pn=${encodeURIComponent(event.title || 'The Arrival Affairs')}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent('Booking: ' + event.title)}`;
-                                  window.location.href = upiLink;
+                              <a
+                                href={`upi://pay?pa=${event.upiId}&pn=${encodeURIComponent(event.title || 'The Arrival Affairs')}&am=${numericAmount}&cu=INR&tn=${encodeURIComponent('Booking: ' + event.title)}`}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 rounded-md h-10 px-4 text-sm font-medium transition-colors"
+                                onClick={(e) => {
+                                  // Fallback: if app doesn't open, copy UPI ID
+                                  setTimeout(() => {
+                                    if (document.visibilityState === 'visible') {
+                                      navigator.clipboard?.writeText(event.upiId || '').catch(() => {});
+                                    }
+                                  }, 2000);
                                 }}
                               >
                                 <Smartphone className="h-4 w-4" />
                                 Pay ₹{numericAmount} via UPI App
-                              </Button>
+                              </a>
                               <p className="text-[10px] text-muted-foreground text-center mt-2">
-                                Opens GPay, PhonePe, or Paytm automatically
+                                Opens GPay, PhonePe, or Paytm • If app doesn&apos;t open, copy the UPI ID above
                               </p>
                             </div>
                           )}
