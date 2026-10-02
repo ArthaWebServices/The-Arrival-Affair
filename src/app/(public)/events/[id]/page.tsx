@@ -2,6 +2,11 @@ import { notFound } from 'next/navigation';
 import { getEventById } from '@/actions/events';
 import EventDetailClient from './EventDetailClient';
 
+// Cache each event page for 60 seconds on the edge.
+// At 10k users, only 1 DB query fires per minute instead of 10,000.
+export const revalidate = 60;
+
+
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
 }

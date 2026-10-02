@@ -6,7 +6,10 @@ import { ReactNode } from 'react';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider
+      refetchOnWindowFocus={false}
+      refetchInterval={5 * 60}
+    >
       {children}
       <Toaster />
     </SessionProvider>

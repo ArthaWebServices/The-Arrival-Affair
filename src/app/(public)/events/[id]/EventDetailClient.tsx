@@ -383,7 +383,7 @@ export default function EventDetailClient({ event }: { event: any }) {
                               value={formData.email}
                               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                               placeholder="you@example.com"
-                              className={`h-12 ${errors.email ? 'border-destructive' : ''}`}
+                              className={`mt-1 h-12 ${errors.email ? 'border-destructive' : ''}`}
                               disabled={isSubmitting}
                             />
                             {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
@@ -391,49 +391,68 @@ export default function EventDetailClient({ event }: { event: any }) {
 
                           {/* Gender */}
                           <div>
-                            <Label htmlFor="gender" className="flex items-center gap-1">
+                            <Label className="flex items-center gap-1 mb-2">
                               <UserCheck className="h-3.5 w-3.5" /> Gender *
                             </Label>
-                            <Select
-                              value={formData.gender}
-                              onValueChange={(v) => setFormData(prev => ({ ...prev, gender: v }))}
-                              disabled={isSubmitting}
-                            >
-                              <SelectTrigger id="gender" className={errors.gender ? 'border-destructive' : ''}>
-                                <SelectValue placeholder="Select your gender" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Male">Male</SelectItem>
-                                <SelectItem value="Female">Female</SelectItem>
-                                <SelectItem value="Non-binary">Non-binary</SelectItem>
-                                <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { value: 'Male', emoji: '👨' },
+                                { value: 'Female', emoji: '👩' },
+                                { value: 'Non-binary', emoji: '🧑' },
+                                { value: 'Prefer not to say', emoji: '🤐' },
+                              ].map(({ value, emoji }) => (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  disabled={isSubmitting}
+                                  onClick={() => setFormData(prev => ({ ...prev, gender: value }))}
+                                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all duration-150 ${
+                                    formData.gender === value
+                                      ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
+                                      : 'border-border bg-background hover:border-primary/50 hover:bg-muted text-muted-foreground'
+                                  } ${errors.gender ? 'border-destructive' : ''}`}
+                                >
+                                  <span className="text-base">{emoji}</span>
+                                  <span className="truncate">{value}</span>
+                                </button>
+                              ))}
+                            </div>
                             {errors.gender && <p className="text-sm text-destructive mt-1">{errors.gender}</p>}
                           </div>
                         </div>
 
                         {/* Food Preference */}
                         <div>
-                          <Label htmlFor="foodPreference" className="flex items-center gap-1">
+                          <Label className="flex items-center gap-1 mb-2">
                             <UtensilsCrossed className="h-3.5 w-3.5" /> Food Preference
                           </Label>
-                          <Select
-                            value={formData.foodPreference}
-                            onValueChange={(v) => setFormData(prev => ({ ...prev, foodPreference: v }))}
-                            disabled={isSubmitting}
-                          >
-                            <SelectTrigger id="foodPreference">
-                              <SelectValue placeholder="Select food preference" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Vegetarian">🥦 Vegetarian</SelectItem>
-                              <SelectItem value="Non-Vegetarian">🍗 Non-Vegetarian</SelectItem>
-                              <SelectItem value="Vegan">🌱 Vegan</SelectItem>
-                              <SelectItem value="Jain">🙏 Jain</SelectItem>
-                              <SelectItem value="No Preference">No Preference</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <div className="flex flex-wrap gap-2">
+                            {[
+                              { value: 'Vegetarian', emoji: '🥦' },
+                              { value: 'Non-Vegetarian', emoji: '🍗' },
+                              { value: 'Vegan', emoji: '🌱' },
+                              { value: 'Jain', emoji: '🙏' },
+                              { value: 'No Preference', emoji: '✌️' },
+                            ].map(({ value, emoji }) => (
+                              <button
+                                key={value}
+                                type="button"
+                                disabled={isSubmitting}
+                                onClick={() => setFormData(prev => ({
+                                  ...prev,
+                                  foodPreference: prev.foodPreference === value ? '' : value
+                                }))}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all duration-150 ${
+                                  formData.foodPreference === value
+                                    ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
+                                    : 'border-border bg-background hover:border-primary/50 hover:bg-muted text-muted-foreground'
+                                }`}
+                              >
+                                <span>{emoji}</span>
+                                <span>{value}</span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -442,11 +461,23 @@ export default function EventDetailClient({ event }: { event: any }) {
                     {hasPayment && (
                       <div className="space-y-4 border-t pt-4">
                         <div className="bg-muted p-4 rounded-lg space-y-3">
-                          <p className="text-sm font-semibold">Pay to Confirm Your Booking</p>
+                          <p className="text-sm font-semibold">💳 Pay to Confirm Your Booking</p>
                           {event.upiId && (
                             <div>
-                              <p className="text-xs font-medium text-muted-foreground">UPI ID</p>
-                              <p className="font-mono text-sm bg-background px-3 py-1.5 rounded border mt-1 select-all">{event.upiId}</p>
+                              <p className="text-xs font-medium text-muted-foreground mb-1">UPI ID</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-mono text-sm bg-background px-3 py-1.5 rounded border flex-1 select-all truncate">{event.upiId}</p>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard?.writeText(event.upiId || '');
+                                  }}
+                                  className="shrink-0 text-xs px-2.5 py-1.5 rounded border border-border bg-background hover:bg-muted transition-colors font-medium text-muted-foreground hover:text-foreground"
+                                  title="Copy UPI ID"
+                                >
+                                  Copy
+                                </button>
+                              </div>
                             </div>
                           )}
                           {event.paymentQrCode && (
